@@ -5,6 +5,7 @@ import { ManagerSingleton } from './ManagerSingleton'
 import { verify } from 'password-hash'
 import { LoginFailedError } from '../exception/LoginFailedError'
 import { sign } from 'jsonwebtoken'
+import { UserNotFoundError } from '../exception/UserNotFoundError'
 
 export class UserEm extends AbstractEntity {
 
@@ -47,17 +48,25 @@ export class UserEm extends AbstractEntity {
 
     async login(email:string, password: string): Promise<User> 
     {
-        const user : User = await this.findByEmail(email)
-
-        if (!verify(password, user.password)) {
-            throw new LoginFailedError()
+        try {
+            const user : User = await this.findByEmail(email)
+            if (!verify(password, user.password)) {
+                throw new LoginFailedError()
+            }
+    
+            user.token = sign({
+                sub: user.id,
+                exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
+            }, Math.random().toString(36).substring(7))
+            
+            return user
+        } catch(e) {
+            if (e instanceof LoginFailedError) {
+                throw new LoginFailedError()
+            } else {
+                throw new UserNotFoundError()
+            }
         }
 
-        user.token = sign({
-            sub: user.id,
-            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
-        }, Math.random().toString(36).substring(7))
-        
-        return user
     }
 }

@@ -12,6 +12,6 @@ export const handleError: (e: Error) => HttpErrorType = (e: Error): HttpErrorTyp
     if (e instanceof UnauthorizedError || e instanceof ConnectionError || e instanceof UserNotFoundError || e instanceof LoginFailedError) {
         return { httpCode: e.getCode(), message: e.message }
     } else {
-        return {httpCode: 500, message: e.message}
+        return {httpCode: 500, message: 'Une erreur est survenu. Merci de réessayer ulterieurement'}
     }
 }
