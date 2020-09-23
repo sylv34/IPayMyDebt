@@ -1,22 +1,19 @@
 import {Request, Response} from 'express'
 import {getConnection} from 'typeorm'
 import {User} from '../entity/User'
-import * as jwt from 'jsonwebtoken'
+import { handleError, HttpErrorType } from '../helpers/errorsHandler'
 import { ManagerSingleton } from '../model/ManagerSingleton'
 import { UserEm } from '../model/UserEm'
 
 const userEm: UserEm = ManagerSingleton.getUserInstance()
 
-export const  login = async (req: Request, res: Response): Promise<Response> => {
+export const login = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const user : User = await userEm.findByEmail(req.body.email) 
-        user.token = jwt.sign({
-            sub: user.id,
-            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
-        }, 'y4oW5W&Zb')
-        res.json(user).end()
-    } catch (e) {
-        res.status(500).send({message: e})
+        const user: User = await userEm.login(req.body.email, req.body.password)
+        res.send(user)
+    } catch(e) {
+        const error: HttpErrorType = handleError(e)
+        res.status(error.httpCode).send(error.message)
     }
     return res
 }

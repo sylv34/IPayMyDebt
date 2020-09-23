@@ -1,14 +1,11 @@
 
 export class BaseError extends Error{
-    status: number;
 
-    constructor(message: string, status: number) {
-        super(message);
-        this.status = status;
-        Object.setPrototypeOf(this, new.target.prototype);
+    constructor(message: string, public httpCode: number) {
+        super(message)
     }
 
-    getStatus() {
-        return this.status;
+    getCode(): number {
+        return this.httpCode
     }
 }

@@ -1,7 +1,6 @@
 import { Car } from '../entity/Car'
 import { Carbon } from '../entity/Carbon'
 
-
 export const getTotalCarbon = (carbons: Carbon[]): {g:number, tone:number} => {
     let total = 0
     carbons.forEach((carbon: Carbon) => total += carbon.gco2)

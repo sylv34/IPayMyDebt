@@ -1,13 +1,17 @@
 import {UnauthorizedError} from '../exception/UnauthorizedError'
 import {ConnectionError} from '../exception/ConnectionError'
-import {NotFoundError} from '../exception/NotFoundError'
+import {UserNotFoundError} from '../exception/UserNotFoundError'
+import { LoginFailedError } from '../exception/LoginFailedError'
 
+export interface HttpErrorType {
+    httpCode: number,
+    message: string
+}
 
-export const handleError = (e: Error):{status: number, message: string} => {
-    if (e instanceof UnauthorizedError || e instanceof ConnectionError || e instanceof NotFoundError) {
-        return {status: e.getStatus(), message: e.message}
+export const handleError: (e: Error) => HttpErrorType = (e: Error): HttpErrorType => {
+    if (e instanceof UnauthorizedError || e instanceof ConnectionError || e instanceof UserNotFoundError || e instanceof LoginFailedError) {
+        return { httpCode: e.getCode(), message: e.message }
     } else {
-        console.log(e)
-        return {status: 500, message: e.message}
+        return {httpCode: 500, message: e.message}
     }
 }

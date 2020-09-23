@@ -2,6 +2,9 @@ import { AbstractEntity } from './AbstractEntity'
 import { User } from '../entity/User'
 import { DeepPartial, EntityManager, DeleteResult } from 'typeorm'
 import { ManagerSingleton } from './ManagerSingleton'
+import { verify } from 'password-hash'
+import { LoginFailedError } from '../exception/LoginFailedError'
+import { sign } from 'jsonwebtoken'
 
 export class UserEm extends AbstractEntity {
 
@@ -40,5 +43,21 @@ export class UserEm extends AbstractEntity {
     async remove(header: string, id: string): Promise<DeleteResult>
     {
         return this.verifyAndGetEntitManger(header).delete(User, id)
+    }
+
+    async login(email:string, password: string): Promise<User> 
+    {
+        const user : User = await this.findByEmail(email)
+
+        if (!verify(password, user.password)) {
+            throw new LoginFailedError()
+        }
+
+        user.token = sign({
+            sub: user.id,
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
+        }, Math.random().toString(36).substring(7))
+        
+        return user
     }
 }

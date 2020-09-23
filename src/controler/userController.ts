@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'
-import {handleError} from '../helpers/errorsHandler'
+import {handleError, HttpErrorType} from '../helpers/errorsHandler'
 import { UserEm } from '../model/UserEm'
 import { User } from '../entity/User'
 import { ManagerSingleton } from '../model/ManagerSingleton'
@@ -11,7 +11,8 @@ export const findAll = async (req: Request, res: Response): Promise<Response> =>
         const users: User[] = await userEm.findAll(req.header('Authorization'))
         res.send(users)
     } catch(e) {
-        res.status(handleError(e).status).send(handleError(e).message)
+        const error: HttpErrorType = handleError(e)
+        res.status(error.httpCode).send(error.message)
     }
     return res
 }
@@ -21,7 +22,8 @@ export const find = async (req: Request, res: Response): Promise<Response> => {
         const user: User = await userEm.find(req.header('Authorization'), req.params.id)
         res.send(user)
     } catch(e) {
-        res.status(handleError(e).status).send(handleError(e).message)
+        const error: HttpErrorType = handleError(e)
+        res.status(error.httpCode).send(error.message)
     }
     return res
 }
@@ -31,7 +33,8 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
         const user: User = await userEm.create(req.header('Authorization'), req.body)
         res.send(user)
     } catch(e) {
-        res.status(handleError(e).status).send(handleError(e).message)
+        const error: HttpErrorType = handleError(e)
+        res.status(error.httpCode).send(error.message)
     }
     return res
 }
@@ -41,7 +44,8 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
         const user: User = await userEm.update(req.header('Authorization'), req.params.id, req.body)
         res.send(user)
     } catch(e) {
-        res.status(handleError(e).status).send(handleError(e).message)
+        const error: HttpErrorType = handleError(e)
+        res.status(error.httpCode).send(error.message)
     }
     return res
 }
@@ -51,7 +55,8 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
         const deleteResult = await userEm.remove(req.header('Authorization'), req.params.id)
         res.send(deleteResult)
     } catch(e) {
-        res.status(handleError(e).status).send(handleError(e).message)
+        const error: HttpErrorType = handleError(e)
+        res.status(error.httpCode).send(error.message)
     }
     return res
 }
